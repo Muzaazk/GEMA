@@ -60,8 +60,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       final lat =
           startCenter.latitude + (target.latitude - startCenter.latitude) * t;
       final lng =
-          startCenter.longitude +
-          (target.longitude - startCenter.longitude) * t;
+          startCenter.longitude + (target.longitude - startCenter.longitude) * t;
       _mapController.move(LatLng(lat, lng), startZoom);
       await Future<void>.delayed(const Duration(milliseconds: 75));
     }
@@ -196,7 +195,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               color: isSelected ? AppTheme.primaryColor : Colors.transparent,
               width: isSelected ? 1.5 : 0,
             ),
-            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+            boxShadow: const [
+              BoxShadow(color: Colors.black26, blurRadius: 4),
+            ],
           ),
           child: Text(
             p.nama,
@@ -560,7 +561,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               );
             },
           ),
-          if (locationState.showDangerOverlay)
+          if (locationState.isDanger)
             const Positioned.fill(child: DangerFlashOverlay()),
           if (locationState.showDangerAlert)
             const Positioned.fill(child: EmergencyAlertModal()),

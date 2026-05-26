@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import '../services/alarm_service.dart';
 import '../services/api_service.dart';
 import '../services/location_service.dart';
 
 final locationServiceProvider = Provider((ref) => LocationService());
 final apiServiceProvider = Provider((ref) => ApiService());
+final alarmServiceProvider = Provider((ref) => AlarmService());
 
 final locationViewModelProvider =
     StateNotifierProvider<LocationViewModel, LocationState>((ref) {
-      return LocationViewModel(
-        ref.read(locationServiceProvider),
-        ref.read(apiServiceProvider),
-      );
-    });
+  return LocationViewModel(
+    ref.read(locationServiceProvider),
+    ref.read(apiServiceProvider),
+    ref.read(alarmServiceProvider),
+  );
+});
 
 class LocationState {
   final Position? currentPosition;
@@ -21,7 +24,6 @@ class LocationState {
   final bool isDanger;
   final bool showDangerAlert;
   final Perlintasan? nearestPerlintasan;
-  final bool showDangerOverlay;
 
   LocationState({
     this.currentPosition,
@@ -29,7 +31,6 @@ class LocationState {
     this.isDanger = false,
     this.showDangerAlert = false,
     this.nearestPerlintasan,
-    this.showDangerOverlay = false,
   });
 
   LocationState copyWith({
@@ -38,7 +39,6 @@ class LocationState {
     bool? isDanger,
     bool? showDangerAlert,
     Perlintasan? nearestPerlintasan,
-    bool? showDangerOverlay,
   }) {
     return LocationState(
       currentPosition: currentPosition ?? this.currentPosition,
@@ -46,7 +46,6 @@ class LocationState {
       isDanger: isDanger ?? this.isDanger,
       showDangerAlert: showDangerAlert ?? this.showDangerAlert,
       nearestPerlintasan: nearestPerlintasan ?? this.nearestPerlintasan,
-      showDangerOverlay: showDangerOverlay ?? this.showDangerOverlay,
     );
   }
 }
@@ -54,11 +53,12 @@ class LocationState {
 class LocationViewModel extends StateNotifier<LocationState> {
   final LocationService _locationService;
   final ApiService _apiService;
+  final AlarmService _alarmService;
   StreamSubscription<Position>? _positionSubscription;
   bool _alertAcknowledged = false;
 
-  LocationViewModel(this._locationService, this._apiService)
-    : super(LocationState()) {
+  LocationViewModel(this._locationService, this._apiService, this._alarmService)
+      : super(LocationState()) {
     _init();
   }
 
@@ -73,9 +73,8 @@ class LocationViewModel extends StateNotifier<LocationState> {
 
     final hasPermission = await _locationService.handlePermission();
     if (hasPermission) {
-      _positionSubscription = _locationService.getLocationStream().listen(
-        _processNewLocation,
-      );
+      _positionSubscription =
+          _locationService.getLocationStream().listen(_processNewLocation);
     }
   }
 
@@ -100,9 +99,8 @@ class LocationViewModel extends StateNotifier<LocationState> {
       }
 
       final radius = p.radiusBahayaMeter.toDouble();
-      final threshold = state.isDanger
-          ? radius * exitThreshold
-          : radius * enterThreshold;
+      final threshold =
+          state.isDanger ? radius * exitThreshold : radius * enterThreshold;
       if (distance <= threshold) {
         danger = true;
       }
@@ -110,8 +108,10 @@ class LocationViewModel extends StateNotifier<LocationState> {
 
     if (!danger) {
       _alertAcknowledged = false;
+      _alarmService.stopAlarm();
     } else if (!state.isDanger) {
       _alertAcknowledged = false;
+      _alarmService.startAlarm();
     }
 
     state = state.copyWith(
@@ -119,7 +119,6 @@ class LocationViewModel extends StateNotifier<LocationState> {
       isDanger: danger,
       showDangerAlert: danger && !_alertAcknowledged,
       nearestPerlintasan: nearest,
-      showDangerOverlay: true,
     );
 
     _apiService.sendLocationUpdate(
@@ -130,12 +129,15 @@ class LocationViewModel extends StateNotifier<LocationState> {
   }
 
   void dismissAlert() {
-    state = state.copyWith(showDangerAlert: false, showDangerOverlay: false);
+    _alertAcknowledged = true;
+    _alarmService.stopAlarm();
+    state = state.copyWith(showDangerAlert: false);
   }
 
   @override
   void dispose() {
     _positionSubscription?.cancel();
+    _alarmService.dispose();
     super.dispose();
   }
 }

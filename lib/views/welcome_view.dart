@@ -71,7 +71,7 @@ class _WelcomeViewState extends State<WelcomeView>
                 padding: const EdgeInsets.symmetric(horizontal: 28),
                 child: Column(
                   children: [
-                    const Spacer(flex: 1),
+                    const SizedBox(height: 82),
                     _buildLogo(),
                     const SizedBox(height: 32),
                     Text(
