@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
-import '../core/assets.dart';
+
 
 /// Mengelola alarm sirene (audio loop) dan getaran HP saat user di danger zone.
 class AlarmService {
