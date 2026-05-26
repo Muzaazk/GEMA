@@ -46,9 +46,9 @@ class _WelcomeViewState extends State<WelcomeView>
     if (_isNavigating) return;
     setState(() => _isNavigating = true);
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const DashboardView()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const DashboardView()));
   }
 
   @override
@@ -59,11 +59,7 @@ class _WelcomeViewState extends State<WelcomeView>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0D47A1),
-              Color(0xFF1565C0),
-              Color(0xFF1E88E5),
-            ],
+            colors: [Color(0xFF0D47A1), Color(0xFF1565C0), Color(0xFF1E88E5)],
           ),
         ),
         child: SafeArea(
@@ -75,7 +71,7 @@ class _WelcomeViewState extends State<WelcomeView>
                 padding: const EdgeInsets.symmetric(horizontal: 28),
                 child: Column(
                   children: [
-                    const Spacer(flex: 2),
+                    const Spacer(flex: 1),
                     _buildLogo(),
                     const SizedBox(height: 32),
                     Text(
@@ -111,8 +107,9 @@ class _WelcomeViewState extends State<WelcomeView>
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppTheme.primaryColor,
-                          disabledBackgroundColor:
-                              Colors.white.withValues(alpha: 0.7),
+                          disabledBackgroundColor: Colors.white.withValues(
+                            alpha: 0.7,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -157,25 +154,9 @@ class _WelcomeViewState extends State<WelcomeView>
   }
 
   Widget _buildLogo() {
-    return Container(
-      width: 130,
-      height: 130,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.35),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    return SizedBox(
+      width: 300,
+      height: 230,
       child: Image.asset(
         AppAssets.logoPutih,
         fit: BoxFit.contain,

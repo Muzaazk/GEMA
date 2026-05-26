@@ -9,11 +9,11 @@ final apiServiceProvider = Provider((ref) => ApiService());
 
 final locationViewModelProvider =
     StateNotifierProvider<LocationViewModel, LocationState>((ref) {
-  return LocationViewModel(
-    ref.read(locationServiceProvider),
-    ref.read(apiServiceProvider),
-  );
-});
+      return LocationViewModel(
+        ref.read(locationServiceProvider),
+        ref.read(apiServiceProvider),
+      );
+    });
 
 class LocationState {
   final Position? currentPosition;
@@ -21,6 +21,7 @@ class LocationState {
   final bool isDanger;
   final bool showDangerAlert;
   final Perlintasan? nearestPerlintasan;
+  final bool showDangerOverlay;
 
   LocationState({
     this.currentPosition,
@@ -28,6 +29,7 @@ class LocationState {
     this.isDanger = false,
     this.showDangerAlert = false,
     this.nearestPerlintasan,
+    this.showDangerOverlay = false,
   });
 
   LocationState copyWith({
@@ -36,6 +38,7 @@ class LocationState {
     bool? isDanger,
     bool? showDangerAlert,
     Perlintasan? nearestPerlintasan,
+    bool? showDangerOverlay,
   }) {
     return LocationState(
       currentPosition: currentPosition ?? this.currentPosition,
@@ -43,6 +46,7 @@ class LocationState {
       isDanger: isDanger ?? this.isDanger,
       showDangerAlert: showDangerAlert ?? this.showDangerAlert,
       nearestPerlintasan: nearestPerlintasan ?? this.nearestPerlintasan,
+      showDangerOverlay: showDangerOverlay ?? this.showDangerOverlay,
     );
   }
 }
@@ -54,7 +58,7 @@ class LocationViewModel extends StateNotifier<LocationState> {
   bool _alertAcknowledged = false;
 
   LocationViewModel(this._locationService, this._apiService)
-      : super(LocationState()) {
+    : super(LocationState()) {
     _init();
   }
 
@@ -69,8 +73,9 @@ class LocationViewModel extends StateNotifier<LocationState> {
 
     final hasPermission = await _locationService.handlePermission();
     if (hasPermission) {
-      _positionSubscription =
-          _locationService.getLocationStream().listen(_processNewLocation);
+      _positionSubscription = _locationService.getLocationStream().listen(
+        _processNewLocation,
+      );
     }
   }
 
@@ -95,8 +100,9 @@ class LocationViewModel extends StateNotifier<LocationState> {
       }
 
       final radius = p.radiusBahayaMeter.toDouble();
-      final threshold =
-          state.isDanger ? radius * exitThreshold : radius * enterThreshold;
+      final threshold = state.isDanger
+          ? radius * exitThreshold
+          : radius * enterThreshold;
       if (distance <= threshold) {
         danger = true;
       }
@@ -113,6 +119,7 @@ class LocationViewModel extends StateNotifier<LocationState> {
       isDanger: danger,
       showDangerAlert: danger && !_alertAcknowledged,
       nearestPerlintasan: nearest,
+      showDangerOverlay: true,
     );
 
     _apiService.sendLocationUpdate(
@@ -123,8 +130,7 @@ class LocationViewModel extends StateNotifier<LocationState> {
   }
 
   void dismissAlert() {
-    _alertAcknowledged = true;
-    state = state.copyWith(showDangerAlert: false);
+    state = state.copyWith(showDangerAlert: false, showDangerOverlay: false);
   }
 
   @override

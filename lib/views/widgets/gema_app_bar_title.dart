@@ -13,13 +13,12 @@ class GemaAppBarTitle extends StatelessWidget {
       children: [
         Image.asset(
           AppAssets.logoPutih,
-          height: 30,
+          height: 65,
           fit: BoxFit.contain,
           filterQuality: FilterQuality.high,
         ),
-        const SizedBox(width: 10),
         Text(
-          'GEMA Dashboard',
+          'Dashboard',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w700,
