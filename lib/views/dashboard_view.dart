@@ -60,7 +60,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       final lat =
           startCenter.latitude + (target.latitude - startCenter.latitude) * t;
       final lng =
-          startCenter.longitude + (target.longitude - startCenter.longitude) * t;
+          startCenter.longitude +
+          (target.longitude - startCenter.longitude) * t;
       _mapController.move(LatLng(lat, lng), startZoom);
       await Future<void>.delayed(const Duration(milliseconds: 75));
     }
@@ -82,7 +83,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   Future<void> _animateRotationToNorth() async {
     final locationState = ref.read(locationViewModelProvider);
     final pos = locationState.currentPosition;
-    
+
     if (pos != null) {
       setState(() {
         _followUserLocation = true;
@@ -91,24 +92,26 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     }
 
     if (!mounted) return;
-    
+
     final token = ++_cameraAnimationToken;
     final startRotation = _mapController.camera.rotation;
     final startCenter = _mapController.camera.center;
     final startZoom = _mapController.camera.zoom;
-    
-    final targetCenter = pos != null ? LatLng(pos.latitude, pos.longitude) : startCenter;
+
+    final targetCenter = pos != null
+        ? LatLng(pos.latitude, pos.longitude)
+        : startCenter;
     final targetZoom = pos != null ? 14.0 : startZoom;
 
     double currentRot = startRotation % 360.0;
     if (currentRot < 0) currentRot += 360.0;
-    
+
     double targetRotation = currentRot > 180 ? 360.0 : 0.0;
 
     // Jika sudah pas di tujuan (utara + posisi user), tidak perlu animasi
-    if (startRotation == 0.0 && 
-        startCenter.latitude == targetCenter.latitude && 
-        startCenter.longitude == targetCenter.longitude && 
+    if (startRotation == 0.0 &&
+        startCenter.latitude == targetCenter.latitude &&
+        startCenter.longitude == targetCenter.longitude &&
         startZoom == targetZoom) {
       return;
     }
@@ -119,15 +122,19 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     for (var i = 1; i <= steps; i++) {
       if (!mounted || token != _cameraAnimationToken) return;
       final t = Curves.easeInOut.transform(i / steps);
-      
-      final lat = startCenter.latitude + (targetCenter.latitude - startCenter.latitude) * t;
-      final lng = startCenter.longitude + (targetCenter.longitude - startCenter.longitude) * t;
+
+      final lat =
+          startCenter.latitude +
+          (targetCenter.latitude - startCenter.latitude) * t;
+      final lng =
+          startCenter.longitude +
+          (targetCenter.longitude - startCenter.longitude) * t;
       final z = startZoom + (targetZoom - startZoom) * t;
       final r = currentRot + (targetRotation - currentRot) * t;
-      
+
       _mapController.move(LatLng(lat, lng), z);
       _mapController.rotate(r % 360.0);
-      
+
       await Future<void>.delayed(const Duration(milliseconds: 16));
     }
 
@@ -254,9 +261,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               color: isSelected ? AppTheme.primaryColor : Colors.transparent,
               width: isSelected ? 1.5 : 0,
             ),
-            boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 4),
-            ],
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
           ),
           child: Text(
             p.nama,
@@ -620,16 +625,13 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               );
             },
           ),
-          if (locationState.isDanger)
-            const Positioned.fill(child: DangerFlashOverlay()),
-          if (locationState.showDangerAlert)
-            const Positioned.fill(child: EmergencyAlertModal()),
           AnimatedBuilder(
             animation: _sheetController,
             builder: (context, child) {
               double bottomPadding = MediaQuery.sizeOf(context).height * 0.34;
               if (_sheetController.isAttached) {
-                bottomPadding = MediaQuery.sizeOf(context).height * _sheetController.size;
+                bottomPadding =
+                    MediaQuery.sizeOf(context).height * _sheetController.size;
               }
               return Positioned(
                 bottom: bottomPadding + 16,
@@ -646,6 +648,10 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               child: const Icon(Icons.explore_outlined, size: 24),
             ),
           ),
+          if (locationState.isDanger)
+            const Positioned.fill(child: DangerFlashOverlay()),
+          if (locationState.showDangerAlert)
+            const Positioned.fill(child: EmergencyAlertModal()),
         ],
       ),
     );

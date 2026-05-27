@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.1
   flutter_riverpod: ^2.5.1
   geolocator: ^13.0.1
   flutter_map: ^7.0.2
@@ -22,6 +24,18 @@ dependencies:
   path_provider: ^2.1.5
   audioplayers: ^6.4.0
   flutter_vibrate: ^1.4.0
+
+flutter_launcher_icons:
+  android: true
+  image_path: assets/icons/logo_gema_putih.png
+  adaptive_icon_foreground: assets/icons/logo_gema_putih.png
+  adaptive_icon_background: "#0066FF"
+
+flutter_native_splash:
+  color: "#0066FF"
+  image: assets/icons/logo_gema_putih.png
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:
